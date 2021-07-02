@@ -1,65 +1,50 @@
 #pragma once
 
-class Home
+
+
+class Branch
 {
 private:
+    static int nesting;
+    const int numberOfChild;
+    Branch* parent;
+    Branch** child;
+
     std::string AlfName{};
 public:
+    Branch(const int inNumberOfChild);
+
+    ~Branch();
+
+    int getNumberOfChild() const;
+
+    Branch* getChildByIndex(int idx);
+
+    int numberOfNeighbors();
+
     void setName(std::string& name);
 
     std::string& getName();
 };
 
-//Средняя ветвь
-
-class Normal
-{
-private:
-    Home* home;
-public:
-    Normal();
-
-    ~Normal();
-
-    Home* getHome();
-};
-
-//Большая ветвь
-
-class Big
-{
-private:
-    const int numberOfNormals;
-    Normal** normals;
-    Home* home;
-public:
-    Big(int const inNumberOfNormals);
-
-    ~Big();
-
-    int getNumberOfNormals() const;
-
-    Normal* getNormalByIndex(int idx);
-
-    Home* getHome();
-
-    int numberOfNeighbors();
-};
+int Branch::nesting = 2;
 
 class Tree
 {
 private:
-    const int numberOfBigs;
-    Big** bigs;
+    const int numberOfBranches;
+    Branch** branches;
 public:
-    Tree(const int inNumberOfBigs, const int normalMin, const int normalMax);
+    Tree(const int inNumberOfBranches, const int childMin, const int childMax);
 
     ~Tree();
 
-    int getNumberOfBigs() const;
+    int getNumberOfBranches() const;
 
-    Big* getBigByIndex(int idx);
+    Branch* getBranchesByIndex(int idx);
 };
+
+
 
 class Forest
 {
@@ -67,8 +52,8 @@ private:
     const int numberOfTrees;
     Tree** trees;
 public:
-    Forest(const int InNumberOfTrees, const int bigsMin, const int bigsMax,
-           const int normalMin, const int normalMax);
+    Forest(const int InNumberOfTrees, const int branchesMin, const int branchesMax,
+           const int childMin, const int childMax);
 
     ~Forest();
 
@@ -76,5 +61,5 @@ public:
 
     Tree* getTreeByIndex(int idx);
 
-    Big* search();
+    Branch* search();
 };

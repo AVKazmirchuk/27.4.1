@@ -1,86 +1,78 @@
 #include <iostream>
 #include "../include/header.h"
 
-void Home::setName(std::string& name) { AlfName = name; }
+//-------Class Branch--------
 
-std::string& Home::getName() { return AlfName; }
-
-
-
-Normal::Normal() { home = new Home; }
-
-Normal::~Normal() { delete home; }
-
-Home* Normal::getHome() { return home; }
-
-
-
-Big::Big(int const inNumberOfNormals) :
-        numberOfNormals{ inNumberOfNormals }
+Branch::Branch(const int inNumberOfChild) :
+    numberOfChild{ inNumberOfChild }
 {
-    normals = new Normal * [numberOfNormals];
-    for (int i{}; i < numberOfNormals; ++i)
-        normals[i] = new Normal;
-
-    home = new Home;
+    child = new Branch * [numberOfChild];
+    for (int i{}; i < numberOfChild; ++i)
+    {
+        child[i] = new Branch(0);
+        child[i]->parent = this;
+    }
 }
 
-Big::~Big()
+Branch::~Branch()
 {
-    for (int i{}; i < numberOfNormals; ++i)
-        delete normals[i];
+    for (int i{}; i < numberOfChild; ++i)
+        delete child[i];
 
-    delete normals;
+    delete child;
 }
 
-int Big::getNumberOfNormals() const { return numberOfNormals; }
+int Branch::getNumberOfChild() const { return numberOfChild; }
 
-Normal* Big::getNormalByIndex(int idx) { return normals[idx]; }
+Branch* Branch::getChildByIndex(int idx) { return child[idx]; }
 
-Home* Big::getHome() { return home; }
-
-int Big::numberOfNeighbors()
+int Branch::numberOfNeighbors()
 {
     int numberOfNeighbors{};
 
-    for (int i{}; i < numberOfNormals; ++i)
-        if (!normals[i]->getHome()->getName().empty()) ++numberOfNeighbors;
+    for (int i{}; i < numberOfChild; ++i)
+        if (!child[i]->getName().empty()) ++numberOfNeighbors;
 
-    if (!getHome()->getName().empty()) ++numberOfNeighbors;
+    if (!getName().empty()) ++numberOfNeighbors;
 
     return --numberOfNeighbors;
 }
 
+void Branch::setName(std::string& name) { AlfName = name; }
 
-Tree::Tree(const int inNumberOfBigs, const int normalMin, const int normalMax) :
-        numberOfBigs{ inNumberOfBigs }
+std::string& Branch::getName() { return AlfName; }
+
+//-------Class Tree----------
+
+Tree::Tree(const int inNumberOfBranches, const int childMin, const int childMax) :
+        numberOfBranches{ inNumberOfBranches }
 {
-    bigs = new Big * [numberOfBigs];
-    for (int i{}; i < numberOfBigs; ++i)
-        bigs[i] = new Big(rand() % (normalMax - normalMin + 1) + normalMin);
+    branches = new Branch * [numberOfBranches];
+    for (int i{}; i < numberOfBranches; ++i)
+        branches[i] = new Branch(rand() % (childMax - childMin + 1) + childMin);
 }
 
 Tree::~Tree()
 {
-    for (int i{}; i < numberOfBigs; ++i)
-        delete bigs[i];
+    for (int i{}; i < numberOfBranches; ++i)
+        delete branches[i];
 
-    delete bigs;
+    delete branches;
 }
 
-int Tree::getNumberOfBigs() const { return numberOfBigs; }
+int Tree::getNumberOfBranches() const { return numberOfBranches; }
 
-Big* Tree::getBigByIndex(int idx) { return bigs[idx]; }
+Branch* Tree::getBranchesByIndex(int idx) { return branches[idx]; }
 
+//-------Class Forest--------
 
-
-Forest::Forest(const int InNumberOfTrees, const int bigsMin, const int bigsMax,
-               const int normalMin, const int normalMax) : numberOfTrees{ InNumberOfTrees }
+Forest::Forest(const int InNumberOfTrees, const int branchesMin, const int branchesMax,
+               const int childMin, const int childMax) : numberOfTrees{ InNumberOfTrees }
 {
     trees = new Tree * [numberOfTrees];
     for (int i{}; i < numberOfTrees; ++i)
-        trees[i] = new Tree(rand() % (bigsMax - bigsMin + 1) + bigsMin,
-                            normalMin, normalMax);
+        trees[i] = new Tree(rand() % (branchesMax - branchesMin + 1) + branchesMin,
+                            childMin, childMax);
 }
 
 Forest::~Forest()
@@ -95,7 +87,7 @@ int Forest::getNumberOfTrees() const { return numberOfTrees; }
 
 Tree* Forest::getTreeByIndex(int idx) { return trees[idx]; }
 
-Big* Forest::search()
+Branch* Forest::search()
 {
     std::cout << "\nName: ";
     std::string name;
@@ -106,15 +98,15 @@ Big* Forest::search()
 
     for (int k{}; k < getNumberOfTrees(); ++k)
     {
-        for (int j{}; j < getTreeByIndex(k)->getNumberOfBigs(); ++j)
+        for (int j{}; j < getTreeByIndex(k)->getNumberOfBranches(); ++j)
         {
-            if (name == getTreeByIndex(k)->getBigByIndex(j)->getHome()->getName())
-                return getTreeByIndex(k)->getBigByIndex(j);
+            if (name == getTreeByIndex(k)->getBranchesByIndex(j)->getName())
+                return getTreeByIndex(k)->getBranchesByIndex(j);
 
-            for (int i{}; i < getTreeByIndex(k)->getBigByIndex(j)->getNumberOfNormals(); ++i)
+            for (int i{}; i < getTreeByIndex(k)->getBranchesByIndex(j)->getNumberOfChild(); ++i)
             {
-                if (name == getTreeByIndex(k)->getBigByIndex(j)->getNormalByIndex(i)->getHome()->getName())
-                    return getTreeByIndex(k)->getBigByIndex(j);
+                if (name == getTreeByIndex(k)->getBranchesByIndex(j)->getChildByIndex(i)->getName())
+                    return getTreeByIndex(k)->getBranchesByIndex(j);
             }
         }
     }

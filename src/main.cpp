@@ -3,6 +3,8 @@
 
 #include "../include/header.h"
 
+
+
 void input(Forest* forest)
 {
     std::string name;
@@ -12,22 +14,24 @@ void input(Forest* forest)
     std::cout << 'T' << " B" << " N" << '\n';
 
     for (int k{}; k < forest->getNumberOfTrees(); ++k)
-        for (int j{}; j < forest->getTreeByIndex(k)->getNumberOfBigs(); ++j)
+        for (int j{}; j < forest->getTreeByIndex(k)->getNumberOfBranches(); ++j)
         {
             std::cout << k << ' ' << j << "  : ";
             std::cin >> name;
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            if (name != "None") forest->getTreeByIndex(k)->getBigByIndex(j)->getHome()->setName(name);
+            if (name != "None") forest->getTreeByIndex(k)->getBranchesByIndex(j)->setName(name);
 
-            for (int i{}; i < forest->getTreeByIndex(k)->getBigByIndex(j)->getNumberOfNormals(); ++i)
+            for (int i{}; i < forest->getTreeByIndex(k)->getBranchesByIndex(j)->getNumberOfChild(); ++i)
             {
                 std::cout << k << ' ' << j << ' ' << i << ": ";
                 std::cin >> name;
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                if (name != "None") forest->getTreeByIndex(k)->getBigByIndex(j)->getNormalByIndex(i)->getHome()->setName(name);
+                if (name != "None") forest->getTreeByIndex(k)->getBranchesByIndex(j)->getChildByIndex(i)->setName(name);
             }
         }
 }
+
+
 
 void output(Forest* forest)
 {
@@ -38,35 +42,41 @@ void output(Forest* forest)
     std::cout << 'T' << " B" << " N" << '\n';
 
     for (int k{}; k < forest->getNumberOfTrees(); ++k)
-        for (int j{}; j < forest->getTreeByIndex(k)->getNumberOfBigs(); ++j)
+        for (int j{}; j < forest->getTreeByIndex(k)->getNumberOfBranches(); ++j)
         {
-            std::cout << k << ' ' << j << "   " << forest->getTreeByIndex(k)->getBigByIndex(j)->getHome()->getName() << '\n';
-            for (int i{}; i < forest->getTreeByIndex(k)->getBigByIndex(j)->getNumberOfNormals(); ++i)
+            std::cout << k << ' ' << j << "   " << forest->getTreeByIndex(k)->getBranchesByIndex(j)->getName() << '\n';
+            for (int i{}; i < forest->getTreeByIndex(k)->getBranchesByIndex(j)->getNumberOfChild(); ++i)
             {
-                std::cout << k << ' ' << j << ' ' << i << ' ' << forest->getTreeByIndex(k)->getBigByIndex(j)->getNormalByIndex(i)->getHome()->getName() << '\n';
+                std::cout << k << ' ' << j << ' ' << i << ' ' << forest->getTreeByIndex(k)->getBranchesByIndex(j)->getChildByIndex(i)->getName() << '\n';
             }
         }
 }
+
+
 
 int main()
 {
     std::srand(static_cast<int>(std::time(nullptr)));
 
-    const int numberOfTrees = 5;
-    const int bigsMin = 3, bigsMax = 5;
-    const int normalMin = 2, normalMax = 3;
+    const int numberOfTrees = 2;
+    const int branchesMin = 1, branchesMax = 2;
+    const int childMin = 1, childMax = 2;
 
-    Forest* forest = new Forest(numberOfTrees, bigsMin, bigsMax,
-                                normalMin, normalMax);
+    /*const int numberOfTrees = 5;
+    const int branchesMin = 3, branchesMax = 5;
+    const int childMin = 2, childMax = 3;*/
+
+    Forest* forest = new Forest(numberOfTrees, branchesMin, branchesMax,
+                                childMin, childMax);
 
     input(forest);
     output(forest);
 
     while (true)
     {
-        if (Big* big = forest->search(); big != nullptr)
+        if (Branch* branch = forest->search(); branch != nullptr)
         {
-            std::cout << "Elf found. Number of neighbors: " << big->numberOfNeighbors();
+            std::cout << "Elf found. Number of neighbors: " << branch->numberOfNeighbors();
 
         }
         else std::cout << "Elf not found!";
